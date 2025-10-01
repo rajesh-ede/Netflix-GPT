@@ -5,6 +5,13 @@
 ->Header
 ->Login
 ->sign up form
+->Form Validation
+->configured firebase depoly
+->Created signUp user Account
+->Implement sign In user api
+->Created Redux store with userSlice
+->Implement sign out 
+->update the profile
 ...
 # Features 
 

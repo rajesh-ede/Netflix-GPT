@@ -7,9 +7,11 @@ import {
   signInWithEmailAndPassword,
   updateProfile
 } from "firebase/auth";
-import { useNavigate } from 'react-router-dom';
+
 import { useDispatch } from 'react-redux';
 import { addUser } from './Utils/userSlice';
+import { useNavigate } from 'react-router-dom';
+
 
 const Login = () => {
   const [isSignForm, setIsSignInForm] = useState(true);
@@ -20,66 +22,99 @@ const Login = () => {
   const email = useRef(null);
   const password = useRef(null);
 
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleButtonClick = () => {
-    const enteredName = name.current?.value || "";
+    console.log("handleButtonClick called — isSignForm:", isSignForm);
+
+    const enteredName = name.current?.value || null;
     const enteredEmail = email.current?.value || "";
     const enteredPassword = password.current?.value || "";
 
-    const message = Validate(enteredName, enteredEmail, enteredPassword);
+    console.log("Inputs:", {
+      enteredName,
+      enteredEmail,
+      enteredPassword
+    });
+
+    // Choose validation logic based on sign-in vs sign-up
+    let message;
+    if (!isSignForm) {
+      message = Validate(enteredName, enteredEmail, enteredPassword);
+      console.log("Validate (signup) result:", message);
+    } else {
+      // For sign-in, skip name validation by passing null for name
+      message = Validate(null, enteredEmail, enteredPassword);
+      console.log("Validate (signin) result:", message);
+    }
+
     if (message) {
+      console.warn("Validation failed:", message);
       setErrorMessage(message);
+      setIsLoading(false);
       return;
     }
 
+    console.log("Validation passed, proceeding with Firebase call");
     setErrorMessage(null);
     setIsLoading(true);
 
     if (!isSignForm) {
-      // Sign Up flow
+      console.log("Signing up user with email:", enteredEmail);
       createUserWithEmailAndPassword(auth, enteredEmail, enteredPassword)
         .then((userCredential) => {
+          console.log("createUserWithEmailAndPassword success:", userCredential);
           const user = userCredential.user;
           return updateProfile(user, {
             displayName: enteredName,
-            photoURL:
-              "https://avatars.githubusercontent.com/u/207333986?s=400&u=7393422b63075016ab06a81bfb7e1bb195cdd81a&v=4"
+            photoURL: "https://i.pinimg.com/736x/91/86/1b/91861b749841221d52122f0c2933d8a6.jpg"
           }).then(() => {
-            const { uid, email, displayName, photoURL } = auth.currentUser;
+            console.log("updateProfile success; user now:", user);
+            const { uid, email, displayName, photoURL } = user;
+            console.log("Dispatch addUser:", { uid, email, displayName, photoURL });
             dispatch(addUser({ uid, email, displayName, photoURL }));
+            console.log("Navigating to /browse after signup");
             navigate("/browse");
+          }).catch((error) => {
+            console.error("updateProfile error:", error);
+            setErrorMessage("Profile update error: " + error.message);
           });
         })
         .catch((error) => {
+          console.error("createUserWithEmailAndPassword error:", error.code, error.message);
           setErrorMessage(`${error.code} - ${error.message}`);
         })
         .finally(() => {
+          console.log("Signup finally block, isLoading -> false");
           setIsLoading(false);
         });
 
     } else {
-      // Sign In flow
+      console.log("Signing in user with email:", enteredEmail);
       signInWithEmailAndPassword(auth, enteredEmail, enteredPassword)
         .then((userCredential) => {
+          console.log("signInWithEmailAndPassword success:", userCredential);
           const user = userCredential.user;
           const { uid, email, displayName, photoURL } = user;
+          console.log("Dispatch addUser in signin:", { uid, email, displayName, photoURL });
           dispatch(addUser({ uid, email, displayName, photoURL }));
+          console.log("Navigating to /browse after signin");
           navigate("/browse");
         })
         .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          setErrorMessage(`${errorCode} - ${errorMessage}`);
+          console.error("signInWithEmailAndPassword error:", error.code, error.message);
+          setErrorMessage(`${error.code} - ${error.message}`);
         })
         .finally(() => {
+          console.log("Signin finally block, isLoading -> false");
           setIsLoading(false);
         });
     }
   };
 
   const toggleSignInForm = () => {
+    console.log("Toggling form, was:", isSignForm);
     setIsSignInForm(!isSignForm);
     setErrorMessage(null);
   };
@@ -96,7 +131,10 @@ const Login = () => {
 
       <div>
         <form
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={(e) => {
+            e.preventDefault();
+            console.log("Form submit prevented");
+          }}
           className="w-3/12 absolute p-12 bg-black/80 my-36 mx-auto right-0 left-0 text-white"
         >
           <h1 className='text-xl p-4'>
@@ -155,6 +193,8 @@ const Login = () => {
 };
 
 export default Login;
+
+
 
 
 

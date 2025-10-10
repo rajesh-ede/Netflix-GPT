@@ -10,3 +10,18 @@
 };
 
 export const IMG_CDN_URL = "https://image.tmdb.org/t/p/w500/";
+
+export const B_G_URL =  "https://assets.nflxext.com/ffe/siteui/vlv3/bebd95d0-65f9-41a9-9d12-4794db63653e/web/IN-en-20250922-TRIFECTA-perspective_5e75cfb4-3797-4f17-866b-181ff91a51dd_large.jpg";
+         
+export const SUP_LAN = [
+  { identifier: "en", name: "English" },
+  { identifier: "hindi", name: "Hindi" },
+  { identifier: "telugu", name: "Telugu" },
+  { identifier: "tamil", name: "Tamil" },
+  { identifier: "spanish", name: "Spanish" },
+  { identifier: "japanese", name: "Japanese" },
+  { identifier: "malayalam", name: "Malayalam" },
+];
+
+   
+        

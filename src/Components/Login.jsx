@@ -11,6 +11,7 @@ import {
 import { useDispatch } from 'react-redux';
 import { addUser } from './Utils/userSlice';
 import { useNavigate } from 'react-router-dom';
+import { B_G_URL } from './Utils/Constants';
 
 
 const Login = () => {
@@ -26,27 +27,23 @@ const Login = () => {
   const navigate = useNavigate();
 
   const handleButtonClick = () => {
-    console.log("handleButtonClick called — isSignForm:", isSignForm);
+  
 
     const enteredName = name.current?.value || null;
     const enteredEmail = email.current?.value || "";
     const enteredPassword = password.current?.value || "";
 
-    console.log("Inputs:", {
-      enteredName,
-      enteredEmail,
-      enteredPassword
-    });
+    
 
     // Choose validation logic based on sign-in vs sign-up
     let message;
     if (!isSignForm) {
       message = Validate(enteredName, enteredEmail, enteredPassword);
-      console.log("Validate (signup) result:", message);
+     
     } else {
       // For sign-in, skip name validation by passing null for name
       message = Validate(null, enteredEmail, enteredPassword);
-      console.log("Validate (signin) result:", message);
+   
     }
 
     if (message) {
@@ -56,25 +53,25 @@ const Login = () => {
       return;
     }
 
-    console.log("Validation passed, proceeding with Firebase call");
+   
     setErrorMessage(null);
     setIsLoading(true);
 
     if (!isSignForm) {
-      console.log("Signing up user with email:", enteredEmail);
+      
       createUserWithEmailAndPassword(auth, enteredEmail, enteredPassword)
         .then((userCredential) => {
-          console.log("createUserWithEmailAndPassword success:", userCredential);
+         
           const user = userCredential.user;
           return updateProfile(user, {
             displayName: enteredName,
             photoURL: "https://i.pinimg.com/736x/91/86/1b/91861b749841221d52122f0c2933d8a6.jpg"
           }).then(() => {
-            console.log("updateProfile success; user now:", user);
+            
             const { uid, email, displayName, photoURL } = user;
-            console.log("Dispatch addUser:", { uid, email, displayName, photoURL });
+            
             dispatch(addUser({ uid, email, displayName, photoURL }));
-            console.log("Navigating to /browse after signup");
+            
             navigate("/browse");
           }).catch((error) => {
             console.error("updateProfile error:", error);
@@ -86,20 +83,20 @@ const Login = () => {
           setErrorMessage(`${error.code} - ${error.message}`);
         })
         .finally(() => {
-          console.log("Signup finally block, isLoading -> false");
+          
           setIsLoading(false);
         });
 
     } else {
-      console.log("Signing in user with email:", enteredEmail);
+      
       signInWithEmailAndPassword(auth, enteredEmail, enteredPassword)
         .then((userCredential) => {
-          console.log("signInWithEmailAndPassword success:", userCredential);
+          
           const user = userCredential.user;
           const { uid, email, displayName, photoURL } = user;
-          console.log("Dispatch addUser in signin:", { uid, email, displayName, photoURL });
+          
           dispatch(addUser({ uid, email, displayName, photoURL }));
-          console.log("Navigating to /browse after signin");
+          
           navigate("/browse");
         })
         .catch((error) => {
@@ -107,14 +104,14 @@ const Login = () => {
           setErrorMessage(`${error.code} - ${error.message}`);
         })
         .finally(() => {
-          console.log("Signin finally block, isLoading -> false");
+         
           setIsLoading(false);
         });
     }
   };
 
   const toggleSignInForm = () => {
-    console.log("Toggling form, was:", isSignForm);
+    
     setIsSignInForm(!isSignForm);
     setErrorMessage(null);
   };
@@ -124,7 +121,7 @@ const Login = () => {
       <Header />
       <div className='absolute'>
         <img
-          src="https://assets.nflxext.com/ffe/siteui/vlv3/bebd95d0-65f9-41a9-9d12-4794db63653e/web/IN-en-20250922-TRIFECTA-perspective_5e75cfb4-3797-4f17-866b-181ff91a51dd_large.jpg"
+          src={B_G_URL}
           alt="background"
         />
       </div>
@@ -133,7 +130,7 @@ const Login = () => {
         <form
           onSubmit={(e) => {
             e.preventDefault();
-            console.log("Form submit prevented");
+            
           }}
           className="w-3/12 absolute p-12 bg-black/80 my-36 mx-auto right-0 left-0 text-white"
         >

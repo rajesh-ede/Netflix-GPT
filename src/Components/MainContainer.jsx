@@ -5,7 +5,7 @@ import VideoBackGround from "../Components/VideoBackGround";
 
 const MainContainer = () => {
     const movies = useSelector((store) => store.movies?.nowPlayingMovies);
-     console.log("Movies from Redux store:", movies);
+     
 
     // ✅ Proper check for data existence and content
     if (!movies || movies.length === 0) {
